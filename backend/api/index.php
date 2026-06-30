@@ -541,23 +541,46 @@ function submitResult(PDO $db, int $id): never
     }
     $roundId = (int) $round['id'];
 
-    // Fetch assignment to get ns_pair_id and ew_pair_id
-    $stAssign = $db->prepare(
-        'SELECT * FROM assignments
-         WHERE round_id = ? AND first_board <= ? AND last_board >= ?
-         LIMIT 1'
-    );
-    $stAssign->execute([$roundId, $boardNumber, $boardNumber]);
+    // Fetch assignment to get ns_pair_id and ew_pair_id.
+    // When boards are shared (same board_set at multiple tables in a round), multiple
+    // assignments may cover the same board_number.  For pair submissions we filter
+    // by the submitting pair; for admin submissions an optional ns_pair_number
+    // may be supplied to disambiguate.
+    if ($actorPairId !== null) {
+        // Pair submitting: find their specific assignment
+        $stAssign = $db->prepare(
+            'SELECT * FROM assignments
+             WHERE round_id = ? AND first_board <= ? AND last_board >= ?
+               AND (ns_pair_id = ? OR ew_pair_id = ?)
+             LIMIT 1'
+        );
+        $stAssign->execute([$roundId, $boardNumber, $boardNumber, $actorPairId, $actorPairId]);
+    } else {
+        // Admin submitting: optional ns_pair_number to select the right table
+        $nsPairNumber = isset($body['ns_pair_number']) ? (int) $body['ns_pair_number'] : null;
+        if ($nsPairNumber !== null) {
+            $stAssign = $db->prepare(
+                'SELECT a.* FROM assignments a
+                 JOIN pairs p ON p.id = a.ns_pair_id
+                 WHERE a.round_id = ? AND a.first_board <= ? AND a.last_board >= ?
+                   AND p.pair_number = ? AND p.tournament_id = ?
+                 LIMIT 1'
+            );
+            $stAssign->execute([$roundId, $boardNumber, $boardNumber, $nsPairNumber, $id]);
+        } else {
+            $stAssign = $db->prepare(
+                'SELECT * FROM assignments
+                 WHERE round_id = ? AND first_board <= ? AND last_board >= ?
+                 ORDER BY table_number
+                 LIMIT 1'
+            );
+            $stAssign->execute([$roundId, $boardNumber, $boardNumber]);
+        }
+    }
+
     $assign = $stAssign->fetch();
     if (!$assign) {
         error_response('No assignment found for this round/board combination');
-    }
-
-    // If pair is submitting, verify they are in this assignment
-    if ($actorPairId !== null) {
-        if ($actorPairId !== (int) $assign['ns_pair_id'] && $actorPairId !== (int) $assign['ew_pair_id']) {
-            error_response('This pair is not assigned to this board/round', 403);
-        }
     }
 
     // Upsert result

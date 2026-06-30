@@ -230,7 +230,7 @@ function renderAssignments(assignments) {
             <span class="meta-value">${escHtml(a.ns_names) || '—'}</span>
           </div>
           <div class="meta-item">
-            <span class="meta-label">EW Pair ${a.ew_pair_number ?? '—'}</span>
+            <span class="meta-label">EW Pair ${a.ew_pair_number ?? 'Bye'}</span>
             <span class="meta-value">${escHtml(a.ew_names)}</span>
           </div>
         </div>

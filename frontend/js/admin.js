@@ -48,7 +48,16 @@ function escHtml(s) {
     .replace(/"/g, '&quot;');
 }
 
-// ─── Tabs ─────────────────────────────────────────────────────────────────────
+// ─── URL helpers ──────────────────────────────────────────────────────────────
+function frontendBase() {
+  return location.origin + location.pathname.replace(/index\.html$/, '').replace(/\/$/, '');
+}
+
+function pairUrl(tournamentId, token) {
+  return `${frontendBase()}/pair.html?id=${tournamentId}&token=${token}`;
+}
+
+
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const pane = btn.dataset.tab;
@@ -86,8 +95,7 @@ document.getElementById('form-create').addEventListener('submit', async e => {
     state.tournamentName = name;
     state.numBoards      = numBoards;
 
-    const base = location.origin + location.pathname.replace(/index\.html$/, '').replace(/\/$/, '');
-    const pairLink = `${base}/pair.html?id=${data.tournament_id}&token=${data.public_token}`;
+    const pairLink = pairUrl(data.tournament_id, data.public_token);
 
     document.getElementById('display-admin-token').textContent = data.admin_token;
     document.getElementById('display-pair-link').textContent   = pairLink;
@@ -138,14 +146,13 @@ async function openDashboard() {
 
 // ─── Pairs table ─────────────────────────────────────────────────────────────
 function renderPairsTable(pairs, numBoards) {
-  const base = location.origin + location.pathname.replace(/index\.html$/, '').replace(/\/$/, '');
   const tbody = document.getElementById('pairs-tbody');
   tbody.innerHTML = pairs.map(p => `
     <tr>
       <td>${p.pair_number}</td>
       <td>${escHtml(p.player1_name) || '<em style="color:var(--muted)">—</em>'}</td>
       <td>${escHtml(p.player2_name) || '<em style="color:var(--muted)">—</em>'}</td>
-      <td><a href="${base}/pair.html?id=${state.tournamentId}&token=${p.join_token}" target="_blank" style="font-size:.8rem">Pair link</a></td>
+      <td><a href="${pairUrl(state.tournamentId, p.join_token)}" target="_blank" style="font-size:.8rem">Pair link</a></td>
     </tr>
   `).join('');
 }

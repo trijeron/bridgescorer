@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS results (
     ew_pair_id     INT UNSIGNED    NOT NULL,
     contract       VARCHAR(10)     NOT NULL DEFAULT '',
     declarer       CHAR(1)         NOT NULL DEFAULT '' COMMENT 'N, S, E, W, or empty',
-    tricks_result  TINYINT         NOT NULL DEFAULT 0  COMMENT 'tricks relative to contract (positive=made, negative=down)',
+    tricks_result  TINYINT         NOT NULL DEFAULT 0  COMMENT 'tricks relative to contract: range -13..+13 (positive=made overtricks, negative=down)',
     raw_score      SMALLINT        NOT NULL DEFAULT 0  COMMENT 'NS perspective (+NS wins, -EW wins)',
     entered_by     INT UNSIGNED    NULL                COMMENT 'pair id or NULL if admin',
     created_at     TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,

@@ -48,7 +48,9 @@ class Movement
 
             for ($t = 1; $t <= $nTables; $t++) {
                 $nsPairNumber = $t;                                         // NS fixed
-                $ewPairNumber = $nTables + (($t - 1 + $r - 1) % $nTables) + 1; // EW advances
+                // EW pairs advance one table clockwise each round.
+                // Formula: within EW block (pairs T+1..2T), index = (table-1 + round-1) mod T
+                $ewPairNumber = $nTables + (($t - 1 + $r - 1) % $nTables) + 1;
 
                 // Board set retreats (opposite to EW direction)
                 $boardSetId  = (($t - $r + $nTables * 100) % $nTables) + 1; // 1-indexed
