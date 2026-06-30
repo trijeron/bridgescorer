@@ -1,0 +1,2 @@
+# bridgescorer
+Bridge score
