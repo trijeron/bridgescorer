@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bridge Scorer – Pair</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <h1>♠ Bridge Scorer</h1>
+    <span class="badge" id="pair-badge">Pair</span>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+
+    <!-- ── Join form ──────────────────────────────────────────────── -->
+    <section id="section-join">
+      <div class="card">
+        <h2>Join Tournament</h2>
+        <div id="alert-join" class="alert"></div>
+
+        <form id="form-join">
+          <div class="form-group">
+            <label>Tournament</label>
+            <p id="join-tournament-name" style="font-weight:700;font-size:1rem;color:var(--brand)">Loading…</p>
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label for="j-player1">Player 1 Name *</label>
+              <input id="j-player1" type="text" placeholder="First name or full name" required>
+            </div>
+            <div class="form-group">
+              <label for="j-player2">Player 2 Name (optional)</label>
+              <input id="j-player2" type="text" placeholder="Second player">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Join as new pair</button>
+        </form>
+
+        <div id="rejoin-section" style="display:none;margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border)">
+          <p style="margin-bottom:.75rem;font-size:.9rem">Already joined? Enter your pair token:</p>
+          <div style="display:flex;gap:.5rem;max-width:420px">
+            <input id="rejoin-token" type="text" placeholder="Pair token" style="flex:1">
+            <button class="btn btn-ghost" id="btn-rejoin">Restore session</button>
+          </div>
+          <div id="alert-rejoin" class="alert" style="margin-top:.5rem"></div>
+        </div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:.75rem" id="btn-show-rejoin">Already joined? →</button>
+      </div>
+    </section>
+
+    <!-- ── Pair dashboard ─────────────────────────────────────────── -->
+    <section id="section-pair" style="display:none">
+
+      <div class="card" style="padding-bottom:.5rem">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem">
+          <div>
+            <h2 style="margin-bottom:.1rem;border:none;padding:0" id="pair-title"></h2>
+            <span id="pair-meta" style="font-size:.85rem;color:var(--muted)"></span>
+          </div>
+          <div>
+            <span style="font-size:.8rem;color:var(--muted)">Your token: </span>
+            <code id="pair-token-display" style="font-size:.8rem"></code>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="ptab-rounds">My Rounds</button>
+        <button class="tab-btn" data-tab="ptab-standings">Standings</button>
+      </div>
+
+      <!-- My rounds tab -->
+      <div id="ptab-rounds" class="tab-pane active">
+        <div id="alert-rounds" class="alert"></div>
+        <div id="rounds-content"><p style="color:var(--muted)">Loading assignments…</p></div>
+      </div>
+
+      <!-- Standings tab -->
+      <div id="ptab-standings" class="tab-pane">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Rank</th><th>Pair</th><th>Players</th><th>Matchpoints</th><th>Boards</th></tr>
+            </thead>
+            <tbody id="pair-standings-tbody">
+              <tr><td colspan="5" style="color:var(--muted)">No results yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:.75rem" id="btn-pair-refresh-standings">↻ Refresh</button>
+      </div>
+
+    </section>
+
+  </div>
+</main>
+
+<script src="js/pair.js"></script>
+</body>
+</html>

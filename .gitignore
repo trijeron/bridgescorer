@@ -1,0 +1,10 @@
+# Local database config (never commit)
+backend/config.local.php
+
+# OS / editor artifacts
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/

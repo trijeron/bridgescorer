@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bridge Scorer – Admin</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <h1>♠ Bridge Scorer</h1>
+    <span class="badge">Admin</span>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+
+    <!-- ── Create tournament ─────────────────────────────────────── -->
+    <section id="section-create">
+      <div class="card">
+        <h2>Create Tournament</h2>
+
+        <div id="alert-create" class="alert"></div>
+
+        <form id="form-create">
+          <div class="grid-2">
+            <div class="form-group">
+              <label for="t-name">Tournament Name *</label>
+              <input id="t-name" type="text" placeholder="e.g. Club Championship 2025" required>
+            </div>
+            <div class="form-group">
+              <label for="t-date">Date (optional)</label>
+              <input id="t-date" type="date">
+            </div>
+            <div class="form-group">
+              <label for="t-pairs">Number of Pairs (2–10) *</label>
+              <input id="t-pairs" type="number" min="2" max="10" value="4" required>
+            </div>
+            <div class="form-group">
+              <label for="t-boards">Number of Boards (1–32) *</label>
+              <input id="t-boards" type="number" min="1" max="32" value="16" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Create Tournament</button>
+        </form>
+      </div>
+
+      <!-- Token display after creation -->
+      <div id="created-info" class="card" style="display:none">
+        <h2>Tournament Created</h2>
+        <p style="margin-bottom:.75rem;">Save these tokens – they are shown only once.</p>
+
+        <div class="form-group">
+          <label>Admin Token (keep secret)</label>
+          <div class="token-box">
+            <span id="display-admin-token"></span>
+            <button class="btn btn-sm btn-ghost" onclick="copyToken('admin')">Copy</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Shareable Pair Link</label>
+          <div class="token-box">
+            <span id="display-pair-link"></span>
+            <button class="btn btn-sm btn-ghost" onclick="copyToken('pair')">Copy</button>
+          </div>
+        </div>
+
+        <button class="btn btn-accent" id="btn-go-dashboard">Go to Dashboard →</button>
+      </div>
+    </section>
+
+    <!-- ── Dashboard (hidden until tournament loaded) ─────────────── -->
+    <section id="section-dashboard" style="display:none">
+
+      <div class="card" style="padding-bottom:.5rem">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem">
+          <div>
+            <h2 style="margin-bottom:.15rem;border:none;padding:0" id="dash-title">Tournament</h2>
+            <span id="dash-meta" style="font-size:.85rem;color:var(--muted)"></span>
+          </div>
+          <button class="btn btn-ghost btn-sm" id="btn-back-create">← New tournament</button>
+        </div>
+
+        <!-- Pair links table -->
+        <div style="margin-top:1rem">
+          <h3>Pair Join Links</h3>
+          <div class="table-wrap">
+            <table id="pairs-table">
+              <thead>
+                <tr>
+                  <th>#</th><th>Player 1</th><th>Player 2</th><th>Join Link</th>
+                </tr>
+              </thead>
+              <tbody id="pairs-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="tab-movement">Movement</button>
+        <button class="tab-btn" data-tab="tab-standings">Standings</button>
+        <button class="tab-btn" data-tab="tab-results">All Results</button>
+        <button class="tab-btn" data-tab="tab-boards">By Board</button>
+      </div>
+
+      <!-- Movement tab -->
+      <div id="tab-movement" class="tab-pane active">
+        <div id="alert-movement" class="alert"></div>
+        <div id="movement-content"><p style="color:var(--muted)">Loading movement…</p></div>
+      </div>
+
+      <!-- Standings tab -->
+      <div id="tab-standings" class="tab-pane">
+        <div id="alert-standings" class="alert"></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Rank</th><th>Pair</th><th>Players</th><th>Matchpoints</th><th>Boards</th></tr>
+            </thead>
+            <tbody id="standings-tbody"><tr><td colspan="5" style="color:var(--muted)">No results yet.</td></tr></tbody>
+          </table>
+        </div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:.75rem" id="btn-refresh-standings">↻ Refresh</button>
+      </div>
+
+      <!-- All results tab -->
+      <div id="tab-results" class="tab-pane">
+        <div id="alert-results" class="alert"></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Rd</th><th>Board</th><th>NS</th><th>EW</th>
+                <th>Contract</th><th>Declarer</th><th>Result</th><th>Score</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="results-tbody"><tr><td colspan="9" style="color:var(--muted)">No results yet.</td></tr></tbody>
+          </table>
+        </div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:.75rem" id="btn-refresh-results">↻ Refresh</button>
+      </div>
+
+      <!-- By board tab -->
+      <div id="tab-boards" class="tab-pane">
+        <div class="form-group" style="max-width:200px">
+          <label for="board-select">Select Board</label>
+          <select id="board-select"><option value="">— choose —</option></select>
+        </div>
+        <div id="board-results-content"></div>
+      </div>
+
+    </section>
+
+  </div><!-- /container -->
+</main>
+
+<!-- ── Edit result modal ──────────────────────────────────────────── -->
+<div id="modal-edit" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center">
+  <div class="card" style="width:min(500px,95vw);margin:0">
+    <h2>Edit Result</h2>
+    <div id="alert-edit" class="alert"></div>
+    <form id="form-edit">
+      <input type="hidden" id="edit-result-id">
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Contract</label>
+          <input id="edit-contract" type="text" placeholder="e.g. 3NT, 4S, Pass">
+        </div>
+        <div class="form-group">
+          <label>Declarer</label>
+          <select id="edit-declarer">
+            <option value="">—</option>
+            <option value="N">N</option><option value="S">S</option>
+            <option value="E">E</option><option value="W">W</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Result (+/−)</label>
+          <input id="edit-tricks" type="number" placeholder="e.g. 0, +1, -2">
+        </div>
+        <div class="form-group">
+          <label>Raw Score (NS)</label>
+          <input id="edit-score" type="number" placeholder="e.g. 120, -100">
+        </div>
+      </div>
+      <div style="display:flex;gap:.75rem;margin-top:.5rem">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button" class="btn btn-ghost" id="btn-cancel-edit">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="js/admin.js"></script>
+</body>
+</html>
